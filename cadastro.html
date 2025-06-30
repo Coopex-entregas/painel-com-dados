@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>📝 Cadastro - COOPEX ENTREGAS</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📝 Cadastro Cliente</h1>
+
+    <label>👤 Nome Completo:</label>
+    <input type="text" id="nome" placeholder="Seu nome completo" required />
+
+    <label>📞 Telefone:</label>
+    <input type="tel" id="telefone" placeholder="(DDD) 9xxxx-xxxx" required />
+
+    <label>🏢 Nome do Estabelecimento (opcional):</label>
+    <input type="text" id="estabelecimento" placeholder="Ex: Loja X, Padaria Y" />
+
+    <label>📍 Endereço para Coleta:</label>
+    <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade" required />
+
+    <button onclick="cadastrarCliente()">✅ Cadastrar</button>
+    <p style="margin-top: 15px;">Já tem cadastro? <a href="index.html">➡️ Ir para o Login</a></p>
+  </div>
+
+  <script>
+    async function cadastrarCliente() {
+      const nome = document.getElementById('nome').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const estabelecimento = document.getElementById('estabelecimento').value.trim();
+      const endereco = document.getElementById('endereco').value.trim();
+
+      if (!nome || !telefone || !endereco) {
+        alert("⚠️ Preencha os campos obrigatórios.");
+        return;
+      }
+
+      try {
+        const response = await fetch("URL_DO_SEU_APP_SCRIPT/cadastrar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome, telefone, estabelecimento, endereco })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          alert("✅ Cadastro realizado com sucesso!");
+          window.location.href = "index.html";
+        } else {
+          alert("❌ Erro ao cadastrar. Tente novamente.");
+        }
+      } catch (e) {
+        alert("🔌 Erro de conexão. Verifique sua internet.");
+      }
+    }
+  </script>
+</body>
+</html>

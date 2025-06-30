@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🔐 COOPEX - Login Cliente</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 COOPEX ENTREGAS</h1>
+    <h2>Login do Cliente</h2>
+
+    <label>👤 Nome:</label>
+    <input type="text" id="loginNome" placeholder="Seu nome completo" />
+
+    <label>📞 Telefone:</label>
+    <input type="tel" id="loginTelefone" placeholder="(DDD) 9xxxx-xxxx" />
+
+    <button id="btnLogin">➡️ Entrar</button>
+    <p style="margin-top: 15px;">Ainda não tem cadastro? <a href="cadastro.html">📝 Cadastrar-se</a></p>
+  </div>
+
+  <script>
+    document.getElementById('btnLogin').onclick = async () => {
+      const nome = document.getElementById('loginNome').value.trim();
+      const telefone = document.getElementById('loginTelefone').value.trim();
+      if (!nome || !telefone) return alert('⚠️ Por favor, preencha nome e telefone.');
+
+      try {
+        const res = await fetch('URL_DO_SEU_APP_SCRIPT/cliente', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, telefone }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          // Guarda cliente no localStorage para o pedido usar
+          localStorage.setItem('cliente', JSON.stringify(data.cliente));
+          window.location = 'pedido.html';
+        } else {
+          alert('❌ Cliente não encontrado. Cadastre-se primeiro.');
+        }
+      } catch (e) {
+        alert('⚠️ Erro de conexão. Tente mais tarde.');
+      }
+    };
+  </script>
+</body>
+</html>
