@@ -61,52 +61,6 @@ function buscarEndereco(tipo, index) {
     .catch(() => alert("Erro ao buscar o CEP."));
 }
 
-function mostrarOpcoesPagamento() {
-  const pix = document.querySelector("input[value='Pix']");
-  const dinheiro = document.querySelector("input[value='Dinheiro']");
-  document.getElementById("mensagemPix").style.display = pix && pix.checked ? "block" : "none";
-  document.getElementById("opcoesDinheiro").style.display = dinheiro && dinheiro.checked ? "flex" : "none";
-}
-
-function fazerLogin() {
-  const nome = document.getElementById("loginNome").value.trim();
-  const tel = document.getElementById("loginTelefone").value.trim();
-  const endereco = document.getElementById("loginEndereco").value.trim();
-
-  if (!nome || !tel || !endereco) {
-    alert("Preencha todos os campos do login.");
-    return;
-  }
-
-  localStorage.setItem("usuarioNome", nome);
-  localStorage.setItem("usuarioTelefone", tel);
-  localStorage.setItem("usuarioEndereco", endereco);
-
-  document.getElementById("nomeSolicitante").value = nome;
-  document.getElementById("telefoneSolicitante").value = tel;
-  document.getElementById("enderecoColetaSalvo").value = endereco;
-
-  document.getElementById("login-container").style.display = "none";
-  document.getElementById("form-container").style.display = "block";
-}
-
-window.onload = () => {
-  const nome = localStorage.getItem("usuarioNome");
-  const tel = localStorage.getItem("usuarioTelefone");
-  const endereco = localStorage.getItem("usuarioEndereco");
-
-  if (nome && tel && endereco) {
-    document.getElementById("nomeSolicitante").value = nome;
-    document.getElementById("telefoneSolicitante").value = tel;
-    document.getElementById("enderecoColetaSalvo").value = endereco;
-    document.getElementById("login-container").style.display = "none";
-    document.getElementById("form-container").style.display = "block";
-  } else {
-    document.getElementById("form-container").style.display = "none";
-  }
-};
-
-// Funções auxiliares para coletar os dados
 function coletarEnderecos(tipo) {
   let lista = [];
   let total = 0;
@@ -143,7 +97,6 @@ function coletarFormaPagamento() {
   return pagamentos.join(", ");
 }
 
-// Função principal para enviar pedido ao Apps Script e abrir WhatsApp
 async function enviarPedido() {
   try {
     const cliente = document.getElementById("nomeSolicitante").value.trim();
@@ -155,7 +108,6 @@ async function enviarPedido() {
       return;
     }
 
-    // Montar dados para enviar
     const dadosParaSalvar = {
       dataPedido: new Date().toLocaleDateString("pt-BR"),
       horaPedido: new Date().toLocaleTimeString("pt-BR"),
@@ -168,16 +120,13 @@ async function enviarPedido() {
       valor
     };
 
-    // URL do seu Apps Script (substitua pelo seu link de implantação)
-    const urlAppsScript = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
+    // SUA URL DO APPS SCRIPT AQUI:
+    const urlAppsScript = "https://script.google.com/macros/s/AKfycbwhGVhJFSrVy8thSduJxXTPQWxO48_nwW4s8TN8NXIWLDau4tdX15ScrV3RodjhbGQ-/exec";
 
-    // Envia os dados para o Apps Script
     const response = await fetch(urlAppsScript, {
       method: "POST",
       body: JSON.stringify(dadosParaSalvar),
-      headers: {
-        "Content-Type": "application/json"
-      }
+      headers: { "Content-Type": "application/json" }
     });
 
     const resultado = await response.json();
@@ -185,7 +134,6 @@ async function enviarPedido() {
     if (resultado.result === "success") {
       alert("Pedido salvo com sucesso! Agora será aberto o WhatsApp para envio.");
 
-      // Montar a mensagem para WhatsApp
       let mensagem = `*Novo Pedido COOPEX ENTREGAS*\n\n`;
       mensagem += `*Data do Pedido:* ${dadosParaSalvar.dataPedido}\n`;
       mensagem += `*Hora do Pedido:* ${dadosParaSalvar.horaPedido}\n`;
@@ -194,8 +142,25 @@ async function enviarPedido() {
 
       mensagem += `*Endereços de Coleta:*\n`;
       dadosParaSalvar.enderecoColeta.forEach((e, i) => {
-        mensagem += `Coleta ${i+1}: ${e.rua}, ${e.numero}, ${e.bairro}, ${e.cidade}, CEP: ${e.cep || "N/A"}\nComplemento: ${e.complemento || "N/A"}\nReferência: ${e.referencia || "N/A"}\n\n`;
+        mensagem += `Coleta ${i + 1}: ${e.rua}, ${e.numero}, ${e.bairro}, ${e.cidade}, CEP: ${e.cep || "N/A"}\nComplemento: ${e.complemento || "N/A"}\nReferência: ${e.referencia || "N/A"}\n\n`;
       });
 
       mensagem += `*Endereços de Entrega:*\n`;
-      dadosParaSalvar.end
+      dadosParaSalvar.enderecoEntrega.forEach((e, i) => {
+        mensagem += `Entrega ${i + 1}: ${e.rua}, ${e.numero}, ${e.bairro}, ${e.cidade}, CEP: ${e.cep || "N/A"}\nComplemento: ${e.complemento || "N/A"}\nReferência: ${e.referencia || "N/A"}\n\n`;
+      });
+
+      mensagem += `*Tipo de Serviço:* ${dadosParaSalvar.tipoServico}\n`;
+      mensagem += `*Forma de Pagamento:* ${dadosParaSalvar.formaPagamento}\n`;
+      mensagem += `*Valor:* ${dadosParaSalvar.valor || "N/A"}\n\n`;
+
+      const telefoneDestino = "5511999999999"; // substitua pelo telefone da COOPEX com código do país
+      const urlWhatsApp = `https://wa.me/${telefoneDestino}?text=${encodeURIComponent(mensagem)}`;
+      window.open(urlWhatsApp, "_blank");
+    } else {
+      alert("Erro ao salvar pedido. Tente novamente.");
+    }
+  } catch (err) {
+    alert("Erro de conexão. Verifique sua internet.");
+  }
+}

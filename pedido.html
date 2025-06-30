@@ -7,9 +7,9 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="form-container">
     <h1 style="text-align:center;">COOPEX ENTREGAS - Solicitar Motoboy</h1>
-    <form id="pedidoForm">
+    <form id="pedidoForm" onsubmit="event.preventDefault(); enviarPedido();">
       <label>👤 Nome do solicitante:</label>
       <input type="text" id="nomeSolicitante" required />
 
@@ -31,46 +31,38 @@
       <div id="entrega-container"></div>
       <button type="button" onclick="adicionarEntrega()">+ Entrega</button>
 
-      <!-- resto do seu formulário ... -->
-
       <label>🤝 Nome de quem receberá:</label>
       <input type="text" id="nomeRecebedor" />
       <label>Telefone de quem receberá (opcional):</label>
       <input type="tel" id="telefoneRecebedor" />
 
-      <!-- Tipo de serviço, pagamento, etc... (mantém seu código original) -->
+      <!-- Exemplo Tipo de Serviço -->
+      <label>Tipo de Serviço:</label>
+      <div class="linha caixinhas">
+        <label><input type="checkbox" name="tipoServico" value="Entrega Rápida" /> Entrega Rápida</label>
+        <label><input type="checkbox" name="tipoServico" value="Entrega Normal" /> Entrega Normal</label>
+      </div>
 
-      <button type="button" onclick="enviarParaWhatsApp()">Enviar Pedido via WhatsApp</button>
+      <!-- Exemplo Forma de Pagamento -->
+      <label>Forma de Pagamento:</label>
+      <div class="linha caixinhas">
+        <label><input type="checkbox" name="formaPagamento" value="Pix" /> Pix</label>
+        <label><input type="checkbox" name="formaPagamento" value="Dinheiro" /> Dinheiro</label>
+        <label><input type="checkbox" name="formaPagamento" value="Comanda" /> Comanda</label>
+      </div>
+
+      <label>Valor:</label>
+      <input type="text" id="valorPedido" />
+
+      <button type="submit">Enviar Pedido via WhatsApp</button>
     </form>
   </div>
 
   <script src="app.js"></script>
-
   <script>
-    // Função para criar o primeiro bloco de coleta com os dados do cliente logado
-    function carregarDadosCliente() {
-      const clienteStr = localStorage.getItem('cliente');
-      if (!clienteStr) {
-        alert('❌ Cliente não está logado. Você será redirecionado para login.');
-        window.location = 'index.html';
-        return;
-      }
-      const cliente = JSON.parse(clienteStr);
-
-      // Preenche os dados básicos do solicitante
-      document.getElementById('nomeSolicitante').value = cliente.nome || '';
-      document.getElementById('telefoneSolicitante').value = cliente.telefone || '';
-      document.getElementById('nomeEstabelecimento').value = cliente.estabelecimento || '';
-
-      // Adiciona o primeiro bloco de coleta já preenchido
-      adicionarColeta();
-
-      // Preencher o bloco coleta 1 com endereço do cliente
-      document.getElementById('ruaColeta1').value = cliente.endereco || '';
-    }
-
     window.onload = () => {
-      carregarDadosCliente();
+      adicionarColeta();
+      adicionarEntrega();
     };
   </script>
 </body>
